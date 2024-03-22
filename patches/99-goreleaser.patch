@@ -1,0 +1,185 @@
+commit 49dbe3408177831a7f8db90affc3d9b925ec635e
+Author: Kevin Conner <kev.conner@getupcloud.com>
+Date:   Fri Mar 22 08:31:32 2024 -0700
+
+    Update goreleaser for multi-arch builds
+
+diff --git a/.goreleaser.yml b/.goreleaser.yml
+index 902a41d..b65396c 100644
+--- a/.goreleaser.yml
++++ b/.goreleaser.yml
+@@ -1,58 +1,96 @@
+ project_name: popeye
+-
+-before:
+-  hooks:
+-    - go mod download
+-
+-release:
+-  prerelease: false
+-
+ builds:
+-  - env:
++  - id: build-linux
++    main: main.go
++    binary: popeye
++    ldflags:
++      - -s -w
++      - "-extldflags '-static'"
++      - "-X github.com/derailed/popeye/cmd.version={{.Version}}"
++      - "-X github.com/derailed/popeye/cmd.commit={{.FullCommit}}"
++      - "-X github.com/derailed/popeye/cmd.date={{.Date}}"
++    env:
+       - CGO_ENABLED=0
+     goos:
+       - linux
+-      - darwin
+-      - windows
+     goarch:
+       - amd64
+-      - arm
+       - arm64
++      - s390x
++      - ppc64le
+     goarm:
+-      - 7
+-    flags:
+-      - -trimpath
+-    ldflags:
+-      - -s -w -X github.com/derailed/popeye/cmd.version={{.Version}}
+-      - -s -w -X github.com/derailed/popeye/cmd.commit={{.Commit}}
+-      - -s -w -X github.com/derailed/popeye/cmd.date={{.Date}}
+-
+-archives:
+-  - name_template: {{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{- if eq .Arch "amd64" }}amd64 {{- else if eq .Arch "386" }}i386 {{- else }}{{ .Arch }}{{ end }} {{- if .Arm }}v{{ .Arm }}{{ end }}
++      - "7"
+ 
+-checksum:
+-  name_template: "checksums.txt"
++dockers:
++  - image_templates:
++      - "ghcr.io/undistro/popeye:{{ .Version }}-amd64"
++    use: buildx
++    goos: linux
++    goarch: amd64
++    ids:
++      - build-linux
++    build_flag_templates:
++      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
++      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
++      - "--label=org.opencontainers.image.version={{ .Version }}"
++      - "--label=org.opencontainers.image.created={{ .Date }}"
++      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
++      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
++      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++      - "--platform=linux/amd64"
++  - image_templates:
++      - "ghcr.io/undistro/popeye:{{ .Version }}-arm64"
++    use: buildx
++    goos: linux
++    goarch: arm64
++    ids:
++      - build-linux
++    build_flag_templates:
++      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
++      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
++      - "--label=org.opencontainers.image.version={{ .Version }}"
++      - "--label=org.opencontainers.image.created={{ .Date }}"
++      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
++      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
++      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++  - image_templates:
++      - "ghcr.io/undistro/popeye:{{ .Version }}-s390x"
++    use: buildx
++    goos: linux
++    goarch: s390x
++    ids:
++      - build-linux
++    build_flag_templates:
++      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
++      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
++      - "--label=org.opencontainers.image.version={{ .Version }}"
++      - "--label=org.opencontainers.image.created={{ .Date }}"
++      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
++      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
++      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++  - image_templates:
++      - "ghcr.io/undistro/popeye:{{ .Version }}-ppc64le"
++    use: buildx
++    goos: linux
++    goarch: ppc64le
++    ids:
++      - build-linux
++    build_flag_templates:
++      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
++      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
++      - "--label=org.opencontainers.image.version={{ .Version }}"
++      - "--label=org.opencontainers.image.created={{ .Date }}"
++      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
++      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
++      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
+ 
+-snapshot:
+-  name_template: "{{ .Tag }}-next"
++docker_manifests:
++  - name_template: 'ghcr.io/undistro/popeye:{{ .Version }}'
++    image_templates:
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-amd64'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-arm64'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-s390x'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-ppc64le'
+ 
+-changelog:
+-  sort: asc
+-  filters:
+-    exclude:
+-      - "^docs:"
+-      - "^test:"
+-
+-brews:
+-  - name: popeye
+-    repository:
+-      owner: derailed
+-      name: popeye-homebrew-tap
+-    commit_author:
+-      name: derailed
+-      email: fernand@imhotep.io
+-    folder: Formula
+-    homepage: https://imhotep.io/popeye
+-    description: A Kubernetes Cluster sanitizer and linter.
+-    test: |
+-      system "popeye version"
++release:
++  disable: true
+diff --git a/Dockerfile b/Dockerfile
+index ec5d955..6c0a8da 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -1,24 +1,8 @@
+-# -----------------------------------------------------------------------------
+-# Build...
+-FROM golang:1.21-alpine3.19 AS build
+-
+-WORKDIR /popeye
+-
+-COPY go.mod go.sum main.go Makefile ./
+-COPY internal internal
+-COPY cmd cmd
+-COPY types types
+-COPY pkg pkg
+-RUN apk --no-cache add make git gcc libc-dev curl ca-certificates binutils-gold && make build
+-
+-# -----------------------------------------------------------------------------
+-# Image...
+ FROM alpine:3.19.0
+ 
+-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+-COPY --from=build /popeye/execs/popeye /bin/popeye
++COPY popeye /bin/popeye
+ 
+ RUN adduser -u 5000 -D nonroot
+ USER 5000
+ 
+-ENTRYPOINT [ "/bin/popeye" ]
+\ No newline at end of file
++ENTRYPOINT [ "/bin/popeye" ]
