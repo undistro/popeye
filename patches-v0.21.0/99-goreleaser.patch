@@ -1,14 +1,14 @@
-commit e404fbd95442223f2cbc299cd83c8377a3556c8f
+commit ffef0c5a0b41a0e817427e7e88748d7c32e13ddd
 Author: Kevin Conner <kev.conner@getupcloud.com>
 Date:   Fri Mar 22 08:31:32 2024 -0700
 
     Update goreleaser for multi-arch builds
 
 diff --git a/.goreleaser.yml b/.goreleaser.yml
-index 34325b0..b65396c 100644
+index 34325b0..f2e8cce 100644
 --- a/.goreleaser.yml
 +++ b/.goreleaser.yml
-@@ -1,64 +1,96 @@
+@@ -1,64 +1,99 @@
  project_name: popeye
 -
 -before:
@@ -94,6 +94,7 @@ index 34325b0..b65396c 100644
 +      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
 +      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
 +      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++      - "--platform=linux/arm64"
 +  - image_templates:
 +      - "ghcr.io/undistro/popeye:{{ .Version }}-s390x"
 +    use: buildx
@@ -109,6 +110,7 @@ index 34325b0..b65396c 100644
 +      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
 +      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
 +      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++      - "--platform=linux/s390x"
 +  - image_templates:
 +      - "ghcr.io/undistro/popeye:{{ .Version }}-ppc64le"
 +    use: buildx
@@ -124,6 +126,7 @@ index 34325b0..b65396c 100644
 +      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
 +      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
 +      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++      - "--platform=linux/ppc64le"
  
 -snapshot:
 -  name_template: "{{ .Tag }}-next"
