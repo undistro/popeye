@@ -1,165 +1,9 @@
-commit ffef0c5a0b41a0e817427e7e88748d7c32e13ddd
+commit cb32aacb87f738d6b745f194694bf7873c935b16
 Author: Kevin Conner <kev.conner@getupcloud.com>
-Date:   Fri Mar 22 08:31:32 2024 -0700
+Date:   Mon Mar 25 06:29:01 2024 -0700
 
-    Update goreleaser for multi-arch builds
+    Switch to undistro specific goreleaser config
 
-diff --git a/.goreleaser.yml b/.goreleaser.yml
-index 34325b0..f2e8cce 100644
---- a/.goreleaser.yml
-+++ b/.goreleaser.yml
-@@ -1,64 +1,99 @@
- project_name: popeye
--
--before:
--  hooks:
--    - go mod download
--
--release:
--  prerelease: false
--
- builds:
--  - env:
-+  - id: build-linux
-+    main: main.go
-+    binary: popeye
-+    ldflags:
-+      - -s -w
-+      - "-extldflags '-static'"
-+      - "-X github.com/derailed/popeye/cmd.version={{.Version}}"
-+      - "-X github.com/derailed/popeye/cmd.commit={{.FullCommit}}"
-+      - "-X github.com/derailed/popeye/cmd.date={{.Date}}"
-+    env:
-       - CGO_ENABLED=0
-     goos:
-       - linux
--      - darwin
--      - windows
-     goarch:
-       - amd64
--      - arm
-       - arm64
-+      - s390x
-+      - ppc64le
-     goarm:
--      - 7
--    flags:
--      - -trimpath
--    ldflags:
--      - -s -w -X github.com/derailed/popeye/cmd.version={{.Version}}
--      - -s -w -X github.com/derailed/popeye/cmd.commit={{.Commit}}
--      - -s -w -X github.com/derailed/popeye/cmd.date={{.Date}}
--
--archives:
--  - name_template: >-
--      {{ .ProjectName }}_
--      {{- .Os }}_
--      {{- if eq .Arch "amd64" }}amd64
--      {{- else if eq .Arch "386" }}i386
--      {{- else }}{{ .Arch }}{{ end }}
--      {{- if .Arm }}v{{ .Arm }}{{ end }}
-+      - "7"
- 
--checksum:
--  name_template: "checksums.txt"
-+dockers:
-+  - image_templates:
-+      - "ghcr.io/undistro/popeye:{{ .Version }}-amd64"
-+    use: buildx
-+    goos: linux
-+    goarch: amd64
-+    ids:
-+      - build-linux
-+    build_flag_templates:
-+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-+      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
-+      - "--label=org.opencontainers.image.version={{ .Version }}"
-+      - "--label=org.opencontainers.image.created={{ .Date }}"
-+      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
-+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-+      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
-+      - "--platform=linux/amd64"
-+  - image_templates:
-+      - "ghcr.io/undistro/popeye:{{ .Version }}-arm64"
-+    use: buildx
-+    goos: linux
-+    goarch: arm64
-+    ids:
-+      - build-linux
-+    build_flag_templates:
-+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-+      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
-+      - "--label=org.opencontainers.image.version={{ .Version }}"
-+      - "--label=org.opencontainers.image.created={{ .Date }}"
-+      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
-+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-+      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
-+      - "--platform=linux/arm64"
-+  - image_templates:
-+      - "ghcr.io/undistro/popeye:{{ .Version }}-s390x"
-+    use: buildx
-+    goos: linux
-+    goarch: s390x
-+    ids:
-+      - build-linux
-+    build_flag_templates:
-+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-+      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
-+      - "--label=org.opencontainers.image.version={{ .Version }}"
-+      - "--label=org.opencontainers.image.created={{ .Date }}"
-+      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
-+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-+      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
-+      - "--platform=linux/s390x"
-+  - image_templates:
-+      - "ghcr.io/undistro/popeye:{{ .Version }}-ppc64le"
-+    use: buildx
-+    goos: linux
-+    goarch: ppc64le
-+    ids:
-+      - build-linux
-+    build_flag_templates:
-+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-+      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
-+      - "--label=org.opencontainers.image.version={{ .Version }}"
-+      - "--label=org.opencontainers.image.created={{ .Date }}"
-+      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
-+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-+      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
-+      - "--platform=linux/ppc64le"
- 
--snapshot:
--  name_template: "{{ .Tag }}-next"
-+docker_manifests:
-+  - name_template: 'ghcr.io/undistro/popeye:{{ .Version }}'
-+    image_templates:
-+    - 'ghcr.io/undistro/popeye:{{ .Version }}-amd64'
-+    - 'ghcr.io/undistro/popeye:{{ .Version }}-arm64'
-+    - 'ghcr.io/undistro/popeye:{{ .Version }}-s390x'
-+    - 'ghcr.io/undistro/popeye:{{ .Version }}-ppc64le'
- 
--changelog:
--  sort: asc
--  filters:
--    exclude:
--      - "^docs:"
--      - "^test:"
--
--brews:
--  - name: popeye
--    repository:
--      owner: derailed
--      name: popeye-homebrew-tap
--    commit_author:
--      name: derailed
--      email: fernand@imhotep.io
--    folder: Formula
--    homepage: https://imhotep.io/popeye
--    description: A Kubernetes Cluster sanitizer and linter.
--    test: |
--      system "popeye version"
-+release:
-+  disable: true
 diff --git a/Dockerfile b/Dockerfile
 index ec5d955..6c0a8da 100644
 --- a/Dockerfile
@@ -192,3 +36,105 @@ index ec5d955..6c0a8da 100644
 -ENTRYPOINT [ "/bin/popeye" ]
 \ No newline at end of file
 +ENTRYPOINT [ "/bin/popeye" ]
+diff --git a/goreleaser.undistro.yaml b/goreleaser.undistro.yaml
+new file mode 100644
+index 0000000..b65396c
+--- /dev/null
++++ b/goreleaser.undistro.yaml
+@@ -0,0 +1,96 @@
++project_name: popeye
++builds:
++  - id: build-linux
++    main: main.go
++    binary: popeye
++    ldflags:
++      - -s -w
++      - "-extldflags '-static'"
++      - "-X github.com/derailed/popeye/cmd.version={{.Version}}"
++      - "-X github.com/derailed/popeye/cmd.commit={{.FullCommit}}"
++      - "-X github.com/derailed/popeye/cmd.date={{.Date}}"
++    env:
++      - CGO_ENABLED=0
++    goos:
++      - linux
++    goarch:
++      - amd64
++      - arm64
++      - s390x
++      - ppc64le
++    goarm:
++      - "7"
++
++dockers:
++  - image_templates:
++      - "ghcr.io/undistro/popeye:{{ .Version }}-amd64"
++    use: buildx
++    goos: linux
++    goarch: amd64
++    ids:
++      - build-linux
++    build_flag_templates:
++      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
++      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
++      - "--label=org.opencontainers.image.version={{ .Version }}"
++      - "--label=org.opencontainers.image.created={{ .Date }}"
++      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
++      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
++      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++      - "--platform=linux/amd64"
++  - image_templates:
++      - "ghcr.io/undistro/popeye:{{ .Version }}-arm64"
++    use: buildx
++    goos: linux
++    goarch: arm64
++    ids:
++      - build-linux
++    build_flag_templates:
++      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
++      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
++      - "--label=org.opencontainers.image.version={{ .Version }}"
++      - "--label=org.opencontainers.image.created={{ .Date }}"
++      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
++      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
++      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++  - image_templates:
++      - "ghcr.io/undistro/popeye:{{ .Version }}-s390x"
++    use: buildx
++    goos: linux
++    goarch: s390x
++    ids:
++      - build-linux
++    build_flag_templates:
++      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
++      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
++      - "--label=org.opencontainers.image.version={{ .Version }}"
++      - "--label=org.opencontainers.image.created={{ .Date }}"
++      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
++      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
++      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++  - image_templates:
++      - "ghcr.io/undistro/popeye:{{ .Version }}-ppc64le"
++    use: buildx
++    goos: linux
++    goarch: ppc64le
++    ids:
++      - build-linux
++    build_flag_templates:
++      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
++      - "--label=org.opencontainers.image.description=A Kubernetes Live Cluster Linter"
++      - "--label=org.opencontainers.image.version={{ .Version }}"
++      - "--label=org.opencontainers.image.created={{ .Date }}"
++      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
++      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
++      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++
++docker_manifests:
++  - name_template: 'ghcr.io/undistro/popeye:{{ .Version }}'
++    image_templates:
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-amd64'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-arm64'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-s390x'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-ppc64le'
++
++release:
++  disable: true
