@@ -41,7 +41,7 @@ new file mode 100644
 index 0000000..b65396c
 --- /dev/null
 +++ b/goreleaser.undistro.yaml
-@@ -0,0 +1,96 @@
+@@ -0,0 +1,99 @@
 +project_name: popeye
 +builds:
 +  - id: build-linux
@@ -97,6 +97,7 @@ index 0000000..b65396c
 +      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
 +      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
 +      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++      - "--platform=linux/arm64"
 +  - image_templates:
 +      - "ghcr.io/undistro/popeye:{{ .Version }}-s390x"
 +    use: buildx
@@ -112,6 +113,7 @@ index 0000000..b65396c
 +      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
 +      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
 +      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++      - "--platform=linux/s390x"
 +  - image_templates:
 +      - "ghcr.io/undistro/popeye:{{ .Version }}-ppc64le"
 +    use: buildx
@@ -127,6 +129,7 @@ index 0000000..b65396c
 +      - "--label=org.opencontainers.image.source=https://github.com/derailed/popeye"
 +      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
 +      - "--label=org.opencontainers.image.url=https://github.com/derailed/popeye"
++      - "--platform=linux/ppc64le"
 +
 +docker_manifests:
 +  - name_template: 'ghcr.io/undistro/popeye:{{ .Version }}'
