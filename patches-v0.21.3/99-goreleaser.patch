@@ -1,14 +1,14 @@
-commit cb32aacb87f738d6b745f194694bf7873c935b16
+commit 673ee08916f0ef9e041eb2ddf9fcc1557c7387f9
 Author: Kevin Conner <kev.conner@getupcloud.com>
-Date:   Mon Mar 25 06:29:01 2024 -0700
+Date:   Thu Mar 28 08:36:49 2024 -0700
 
     Switch to undistro specific goreleaser config
 
 diff --git a/Dockerfile b/Dockerfile
-index ec5d955..6c0a8da 100644
+index ec5d955..32ce543 100644
 --- a/Dockerfile
 +++ b/Dockerfile
-@@ -1,24 +1,8 @@
+@@ -1,24 +1,10 @@
 -# -----------------------------------------------------------------------------
 -# Build...
 -FROM golang:1.21-alpine3.19 AS build
@@ -28,6 +28,8 @@ index ec5d955..6c0a8da 100644
  
 -COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 -COPY --from=build /popeye/execs/popeye /bin/popeye
++RUN apk upgrade && rm /var/cache/apk/*
++
 +COPY popeye /bin/popeye
  
  RUN adduser -u 5000 -D nonroot
@@ -38,7 +40,7 @@ index ec5d955..6c0a8da 100644
 +ENTRYPOINT [ "/bin/popeye" ]
 diff --git a/goreleaser.undistro.yaml b/goreleaser.undistro.yaml
 new file mode 100644
-index 0000000..b65396c
+index 0000000..f2e8cce
 --- /dev/null
 +++ b/goreleaser.undistro.yaml
 @@ -0,0 +1,99 @@
