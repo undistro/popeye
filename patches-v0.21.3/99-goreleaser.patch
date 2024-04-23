@@ -140,7 +140,7 @@ index 0000000..f2e8cce
 +    - 'ghcr.io/undistro/popeye:{{ .Version }}-arm64'
 +    - 'ghcr.io/undistro/popeye:{{ .Version }}-s390x'
 +    - 'ghcr.io/undistro/popeye:{{ .Version }}-ppc64le'
-+  - name_template: 'ghcr.io/undistro/popeye:{{ .Major }}{{ .Minor }}'
++  - name_template: 'ghcr.io/undistro/popeye:{{ .Major }}.{{ .Minor }}'
 +    image_templates:
 +    - 'ghcr.io/undistro/popeye:{{ .Version }}-amd64'
 +    - 'ghcr.io/undistro/popeye:{{ .Version }}-arm64'
