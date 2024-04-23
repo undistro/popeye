@@ -43,7 +43,7 @@ new file mode 100644
 index 0000000..f2e8cce
 --- /dev/null
 +++ b/goreleaser.undistro.yaml
-@@ -0,0 +1,99 @@
+@@ -0,0 +1,111 @@
 +project_name: popeye
 +builds:
 +  - id: build-linux
@@ -135,6 +135,18 @@ index 0000000..f2e8cce
 +
 +docker_manifests:
 +  - name_template: 'ghcr.io/undistro/popeye:{{ .Version }}'
++    image_templates:
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-amd64'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-arm64'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-s390x'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-ppc64le'
++  - name_template: 'ghcr.io/undistro/popeye:{{ .Major }}{{ .Minor }}'
++    image_templates:
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-amd64'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-arm64'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-s390x'
++    - 'ghcr.io/undistro/popeye:{{ .Version }}-ppc64le'
++  - name_template: 'ghcr.io/undistro/popeye:latest'
 +    image_templates:
 +    - 'ghcr.io/undistro/popeye:{{ .Version }}-amd64'
 +    - 'ghcr.io/undistro/popeye:{{ .Version }}-arm64'
