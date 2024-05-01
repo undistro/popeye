@@ -7,4 +7,7 @@ PATCH_GO_PATH="$(ls -d ${RUNNER_TOOL_CACHE}/go/${PATCH_GO_VERSION}.*/*/bin)"
 export PATH="${PATH}:${PATCH_GO_PATH}"
 
 echo "Patching go dependencies to address vulnerabilities"
-go get k8s.io/apimachinery@v0.30.0
+
+go get \
+   k8s.io/apimachinery@v0.30.0 \
+   github.com/cilium/cilium@1.15.2
