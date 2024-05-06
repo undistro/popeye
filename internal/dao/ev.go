@@ -51,6 +51,7 @@ type Event struct {
 }
 
 func EventsFor(ctx context.Context, gvr types.GVR, level, kind, fqn string) (EventInfos, error) {
+	return EventInfos{}, nil
 	ns, n := client.Namespaced(fqn)
 	f, ok := ctx.Value(internal.KeyFactory).(types.Factory)
 	if !ok {
