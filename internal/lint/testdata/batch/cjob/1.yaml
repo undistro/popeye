@@ -72,5 +72,60 @@ items:
     schedule: '* * * * *'
     successfulJobsHistoryLimit: 3
     suspend: true
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    name: cj3
+    namespace: default
+  spec:
+    concurrencyPolicy: Forbid
+    failedJobsHistoryLimit: 1
+    jobTemplate:
+      spec:
+        template:
+          spec:
+            serviceAccountName: sa-bozo
+            containers:
+            - image: blang/busybox-bash
+              imagePullPolicy: Always
+              name: c1
+              resources: {}
+            dnsPolicy: ClusterFirst
+            restartPolicy: OnFailure
+            schedulerName: default-scheduler
+            securityContext: {}
+            terminationGracePeriodSeconds: 30
+    schedule: '* * * * *'
+    successfulJobsHistoryLimit: 3
+    suspend: true
   status:
-      active: []
+    lastScheduleTime: "2024-05-03T17:48:00Z"
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    name: cj4
+    namespace: default
+  spec:
+    concurrencyPolicy: Forbid
+    failedJobsHistoryLimit: 1
+    jobTemplate:
+      spec:
+        template:
+          spec:
+            serviceAccountName: sa-bozo
+            containers:
+            - image: blang/busybox-bash
+              imagePullPolicy: Always
+              name: c1
+              resources: {}
+            dnsPolicy: ClusterFirst
+            restartPolicy: OnFailure
+            schedulerName: default-scheduler
+            securityContext: {}
+            terminationGracePeriodSeconds: 30
+    schedule: '* * * * *'
+    successfulJobsHistoryLimit: 3
+    suspend: true
+  status:
+    lastScheduleTime: "2024-05-03T17:48:00Z"
+    lastSuccessfulTime: "2024-05-03T15:48:38Z"

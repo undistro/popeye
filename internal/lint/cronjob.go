@@ -57,10 +57,7 @@ func (s *CronJob) checkCronJob(ctx context.Context, fqn string, cj *batchv1.Cron
 		s.AddCode(ctx, 1500, cj.Kind)
 	}
 
-	if len(cj.Status.Active) == 0 {
-		s.AddCode(ctx, 1501)
-	}
-	if cj.Status.LastSuccessfulTime == nil {
+	if cj.Status.LastScheduleTime == nil || cj.Status.LastSuccessfulTime == nil || cj.Status.LastSuccessfulTime.Before(cj.Status.LastScheduleTime) {
 		s.AddCode(ctx, 1502)
 	}
 
