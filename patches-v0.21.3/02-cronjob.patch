@@ -1,26 +1,28 @@
-commit 6860ee37eece5f4c83d37f52bf308257395f7a37
+commit 38e629bd801f7f5f3c15430a210b4dc8520fc709
 Author: Kevin Conner <kev.conner@getupcloud.com>
-Date:   Mon May 6 12:59:15 2024 -0700
+Date:   Mon May 6 15:49:17 2024 -0700
 
     Remove check for no active jobs, since CronJobs are periodic, and fix issues identifying CronJob failures
 
 diff --git a/internal/lint/cronjob.go b/internal/lint/cronjob.go
-index 802b57e..1c93bfb 100644
+index 802b57e..9a13995 100644
 --- a/internal/lint/cronjob.go
 +++ b/internal/lint/cronjob.go
-@@ -57,10 +57,8 @@ func (s *CronJob) checkCronJob(ctx context.Context, fqn string, cj *batchv1.Cron
- 		s.AddCode(ctx, 1500, cj.Kind)
+@@ -58,10 +58,10 @@ func (s *CronJob) checkCronJob(ctx context.Context, fqn string, cj *batchv1.Cron
  	}
  
--	if len(cj.Status.Active) == 0 {
+ 	if len(cj.Status.Active) == 0 {
 -		s.AddCode(ctx, 1501)
 -	}
 -	if cj.Status.LastSuccessfulTime == nil {
-+	if (cj.Status.LastScheduleTime == nil && len(cj.Status.Active) == 0) ||
-+		(cj.Status.LastScheduleTime != nil && (cj.Status.LastSuccessfulTime == nil || cj.Status.LastSuccessfulTime.Before(cj.Status.LastScheduleTime))) {
- 		s.AddCode(ctx, 1502)
+-		s.AddCode(ctx, 1502)
++		if cj.Status.LastScheduleTime == nil ||
++			(cj.Status.LastScheduleTime != nil && (cj.Status.LastSuccessfulTime == nil || cj.Status.LastSuccessfulTime.Before(cj.Status.LastScheduleTime))) {
++			s.AddCode(ctx, 1502)
++		}
  	}
  
+ 	if sa := cj.Spec.JobTemplate.Spec.Template.Spec.ServiceAccountName; sa != "" {
 diff --git a/internal/lint/cronjob_test.go b/internal/lint/cronjob_test.go
 index eb6dbb2..151b8f2 100644
 --- a/internal/lint/cronjob_test.go
