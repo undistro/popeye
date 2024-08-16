@@ -12,7 +12,7 @@ echo "Patching go dependencies to address vulnerabilities"
 
 go get \
    k8s.io/apimachinery@v0.30.0 \
-   github.com/cilium/cilium@1.15.6
+   github.com/cilium/cilium@1.15.8
 
 echo "Running go mod tidy"
 go mod tidy
