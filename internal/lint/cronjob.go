@@ -58,10 +58,10 @@ func (s *CronJob) checkCronJob(ctx context.Context, fqn string, cj *batchv1.Cron
 	}
 
 	if len(cj.Status.Active) == 0 {
-		s.AddCode(ctx, 1501)
-	}
-	if cj.Status.LastSuccessfulTime == nil {
-		s.AddCode(ctx, 1502)
+		if cj.Status.LastScheduleTime == nil ||
+			(cj.Status.LastScheduleTime != nil && (cj.Status.LastSuccessfulTime == nil || cj.Status.LastSuccessfulTime.Before(cj.Status.LastScheduleTime))) {
+			s.AddCode(ctx, 1502)
+		}
 	}
 
 	if sa := cj.Spec.JobTemplate.Spec.Template.Spec.ServiceAccountName; sa != "" {
