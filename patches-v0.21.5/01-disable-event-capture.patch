@@ -1,0 +1,18 @@
+commit b40744104afb000839c8bcc9e0e22be58f2f3881
+Author: Kevin Conner <kev.conner@getupcloud.com>
+Date:   Wed Mar 27 18:17:16 2024 -0700
+
+    Update Disable event capture patch for v0.21.3
+
+diff --git a/internal/dao/ev.go b/internal/dao/ev.go
+index 2cc1167..f182773 100644
+--- a/internal/dao/ev.go
++++ b/internal/dao/ev.go
+@@ -51,6 +51,7 @@ type Event struct {
+ }
+ 
+ func EventsFor(ctx context.Context, gvr types.GVR, level, kind, fqn string) (EventInfos, error) {
++	return EventInfos{}, nil
+ 	ns, n := client.Namespaced(fqn)
+ 	f, ok := ctx.Value(internal.KeyFactory).(types.Factory)
+ 	if !ok {
